@@ -30,7 +30,7 @@
       padding: 25px 15px;
     }
 
-    /* Logo Oficial Incrustado */
+    /* Logo Oficial */
     .brand-logo-img {
       max-width: 250px;
       height: auto;
@@ -97,7 +97,6 @@
       box-shadow: 0 0 30px rgba(227, 6, 19, 0.35);
     }
 
-    /* Center Scissor Icon */
     .wheel-center-icon {
       position: absolute;
       width: 50px;
@@ -149,7 +148,7 @@
       transform: none;
     }
 
-    /* Mensajes de Resultado y Bloqueo */
+    /* Mensajes */
     .status-box {
       margin-top: 20px;
       padding: 15px;
@@ -182,6 +181,7 @@
       padding: 15px;
       width: 100%;
       margin-top: 25px;
+      display: none;
     }
 
     .admin-panel h3 {
@@ -220,8 +220,8 @@
 </head>
 <body>
 
-  <!-- TU LOGO OFICIAL INCRUSTADO DIRECTAMENTE -->
-  <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBaRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFnZSIABgAA... [truncated]" alt="0800 Creaciones" class="brand-logo-img" id="logoImg">
+  <!-- LOGO -->
+  <img src="logo.jpg" alt="0800 Creaciones" class="brand-logo-img" onerror="this.style.display='none'">
 
   <!-- TITLE -->
   <div class="header-text">
@@ -242,19 +242,16 @@
 
     <div id="statusBox" class="status-box"></div>
 
-    <!-- PANEL SOLO PARA EL DUEÑO (OCULTO A CLIENTES) -->
-    <div id="adminPanel" class="admin-panel" style="display: none;">
-      <h3>🔒 Panel de Control (Uso Interno)</h3>
-      <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Generá el enlace único para enviarle al cliente por WhatsApp:</p>
+    <!-- PANEL DE CONTROL PROTEGIDO (SOLO SE ABRE CON ?admin=0214) -->
+    <div id="adminPanel" class="admin-panel">
+      <h3>🔒 Panel de Control (Dueño)</h3>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Generá el enlace único para el cliente:</p>
       <input type="text" id="generatedUrl" class="admin-input" readonly placeholder="Hacé clic abajo para generar el enlace">
       <button class="btn-admin" onclick="generateClientToken()">✨ Generar y Copiar Link Único</button>
     </div>
   </div>
 
   <script>
-    // Asignar el logo real codificado para garantizar visualización inmediata
-    document.getElementById('logoImg').src = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBaRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFnZSIABgAA... (imagen cargada)";
-    // Configuración de Premios Exactos
     const prizes = [
       { label: "5% de descuento", color: "#E30613", textColor: "#ffffff" },
       { label: "Gracias por tu compra,\nsuerte la próxima", color: "#1c1c1c", textColor: "#aaaaaa" },
@@ -272,23 +269,27 @@
     let currentAngle = 0;
     let isSpinning = false;
 
-    // Detectar cliente o dueño por URL
+    // Validación de accesos por URL (clave cambiada a 0214)
     const urlParams = new URLSearchParams(window.location.search);
     const clientToken = urlParams.get("token");
-    const isAdmin = !clientToken;
+    const adminKey = urlParams.get("admin");
 
-    if (isAdmin) {
+    const isOwner = (adminKey === "0214");
+
+    if (isOwner) {
       adminPanel.style.display = "block";
-    } else {
+      showStatus("🛠️ Modo Administrador Activo. Podés generar enlaces para clientes.", "ticket");
+    } else if (clientToken) {
       showStatus(`● Ticket Activo: #${clientToken}`, "ticket");
-    }
-
-    if (clientToken) {
+      
       const usedTokens = JSON.parse(localStorage.getItem("usedTokens") || "[]");
       if (usedTokens.includes(clientToken)) {
         showStatus("⚠️ Este enlace ya fue utilizado y tu premio quedó registrado. ¡Gracias por tu compra!", "error");
         spinBtn.disabled = true;
       }
+    } else {
+      showStatus("⚠️ Enlace no válido. Solicitá tu enlace exclusivo a 0800 Creaciones tras realizar una compra.", "error");
+      spinBtn.disabled = true;
     }
 
     // --- SONIDOS NATIVOS ---
@@ -419,49 +420,4 @@
           if (prize.includes("Otro tiro")) {
             showStatus("🎯 ¡OTRO TIRO! La ruleta vuelve a girar automáticamente...", "ticket");
             setTimeout(() => {
-              spinWheel();
-            }, 1800);
-          } else {
-            if (prize.includes("Gracias")) {
-              showStatus(`💬 ${prize}.<br><br><b>📸 ¡Hacé captura de pantalla ahora!</b> Este enlace es de un solo uso y no habrá otro tiro.`, "ticket");
-            } else {
-              showStatus(`🎉 ¡FELICITACIONES! Ganaste: <b>${prize}</b>.<br><br><b>📸 ¡Hacé captura de pantalla ahora!</b> Presentá esta imagen para reclamar tu premio. No habrá otro tiro.`, "ticket");
-            }
-
-            if (clientToken) {
-              const usedTokens = JSON.parse(localStorage.getItem("usedTokens") || "[]");
-              usedTokens.push(clientToken);
-              localStorage.setItem("usedTokens", JSON.stringify(usedTokens));
-            }
-          }
-        }
-      }
-
-      requestAnimationFrame(animate);
-    }
-
-    function showStatus(msg, type) {
-      statusBox.style.display = "block";
-      statusBox.className = `status-box status-${type}`;
-      statusBox.innerHTML = msg;
-    }
-
-    function generateClientToken() {
-      const newToken = '0800-' + Math.random().toString(36).substr(2, 8).toUpperCase();
-      const baseUrl = window.location.origin + window.location.pathname;
-      const fullUrl = `${baseUrl}?token=${newToken}`;
-      
-      const input = document.getElementById("generatedUrl");
-      input.value = fullUrl;
-      
-      navigator.clipboard.writeText(fullUrl).then(() => {
-        alert("¡Enlace único copiado exitosamente! Ya podés pegarlo en WhatsApp para enviárselo a tu cliente.");
-      }).catch(() => {
-        alert("Enlace generado. Copialo directamente del casillero.");
-      });
-    }
-
-    drawWheel();
-  </script>
-</body>
-</html>
+              spin
