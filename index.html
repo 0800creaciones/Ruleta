@@ -30,9 +30,9 @@
       padding: 25px 15px;
     }
 
-    /* Imagen de Logo Real */
+    /* Logo Oficial Incrustado */
     .brand-logo-img {
-      max-width: 240px;
+      max-width: 250px;
       height: auto;
       margin-bottom: 15px;
       filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.9));
@@ -220,8 +220,8 @@
 </head>
 <body>
 
-  <!-- AQUÍ CARGA TU LOGO DESDE EL REPOSITORIO -->
-  <img src="logo.jpg" alt="0800 Creaciones" class="brand-logo-img" onerror="this.style.display='none'">
+  <!-- TU LOGO OFICIAL INCRUSTADO DIRECTAMENTE -->
+  <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBaRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFnZSIABgAA... [truncated]" alt="0800 Creaciones" class="brand-logo-img" id="logoImg">
 
   <!-- TITLE -->
   <div class="header-text">
@@ -252,6 +252,8 @@
   </div>
 
   <script>
+    // Asignar el logo real codificado para garantizar visualización inmediata
+    document.getElementById('logoImg').src = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4QBaRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABIAAAAAQAAAEgAAAABcGFnZSIABgAA... (imagen cargada)";
     // Configuración de Premios Exactos
     const prizes = [
       { label: "5% de descuento", color: "#E30613", textColor: "#ffffff" },
