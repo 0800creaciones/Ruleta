@@ -152,24 +152,25 @@
     /* Mensajes de Resultado y Bloqueo */
     .status-box {
       margin-top: 20px;
-      padding: 12px 18px;
-      border-radius: 20px;
+      padding: 15px;
+      border-radius: 12px;
       text-align: center;
       width: 100%;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       font-weight: 600;
       display: none;
+      line-height: 1.5;
     }
 
     .status-ticket {
-      background-color: rgba(46, 204, 113, 0.1);
-      border: 1px solid rgba(46, 204, 113, 0.3);
+      background-color: rgba(46, 204, 113, 0.12);
+      border: 1px solid rgba(46, 204, 113, 0.4);
       color: #2ecc71;
     }
 
     .status-error {
-      background-color: rgba(231, 76, 60, 0.1);
-      border: 1px solid rgba(231, 76, 60, 0.3);
+      background-color: rgba(231, 76, 60, 0.12);
+      border: 1px solid rgba(231, 76, 60, 0.4);
       color: #e74c3c;
     }
 
@@ -220,7 +221,7 @@
 <body>
 
   <!-- AQUÍ CARGA TU LOGO DESDE EL REPOSITORIO -->
-  <img src="logo.jpg" alt="0800 Creaciones" class="brand-logo-img">
+  <img src="logo.jpg" alt="0800 Creaciones" class="brand-logo-img" onerror="this.style.display='none'">
 
   <!-- TITLE -->
   <div class="header-text">
@@ -420,9 +421,9 @@
             }, 1800);
           } else {
             if (prize.includes("Gracias")) {
-              showStatus(`💬 ${prize}`, "ticket");
+              showStatus(`💬 ${prize}.<br><br><b>📸 ¡Hacé captura de pantalla ahora!</b> Este enlace es de un solo uso y no habrá otro tiro.`, "ticket");
             } else {
-              showStatus(`🎉 ¡FELICITACIONES! Ganaste: ${prize}`, "ticket");
+              showStatus(`🎉 ¡FELICITACIONES! Ganaste: <b>${prize}</b>.<br><br><b>📸 ¡Hacé captura de pantalla ahora!</b> Presentá esta imagen para reclamar tu premio. No habrá otro tiro.`, "ticket");
             }
 
             if (clientToken) {
@@ -440,7 +441,7 @@
     function showStatus(msg, type) {
       statusBox.style.display = "block";
       statusBox.className = `status-box status-${type}`;
-      statusBox.innerText = msg;
+      statusBox.innerHTML = msg;
     }
 
     function generateClientToken() {
