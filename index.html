@@ -3,498 +3,462 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ruleta de Premios | 0800 Creaciones</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brandRed: '#E50914',
-            brandRedHover: '#C10710',
-            brandDark: '#111111',
-            brandBlack: '#050505',
-            brandGray: '#1F1F1F',
-            brandLightGray: '#2D2D2D'
-          },
-          fontFamily: {
-            brand: ['Orbitron', 'sans-serif'],
-            sans: ['Poppins', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
-
+  <title>0800 Creaciones - Ruleta de Premios</title>
   <style>
-    /* Custom CSS for brand styling & animations */
+    :root {
+      --primary-red: #E30613;
+      --dark-bg: #0b0b0b;
+      --card-bg: #141414;
+      --text-white: #ffffff;
+      --border-color: #222222;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
     body {
-      background-color: #080808;
-      color: #ffffff;
-      font-family: 'Poppins', sans-serif;
+      background-color: var(--dark-bg);
+      color: var(--text-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 25px 15px;
     }
 
-    .brand-title-0800 {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      letter-spacing: 1px;
-      -webkit-text-stroke: 2px #000;
-      color: #ffffff;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    /* Imagen de Logo Real */
+    .brand-logo-img {
+      max-width: 240px;
+      height: auto;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.9));
+      border-radius: 8px;
     }
 
-    .brand-title-creaciones {
-      font-family: 'Poppins', sans-serif;
+    /* Encabezado */
+    .header-text {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .header-text h1 {
+      font-size: 1.8rem;
       font-weight: 800;
-      color: #E50914;
-      font-style: italic;
-      letter-spacing: -0.5px;
-      text-shadow: 2px 2px 0px #000000, -1px -1px 0px #000000;
+      color: #ffffff;
+      margin-bottom: 4px;
     }
 
-    .canvas-container {
+    .header-text p {
+      color: #777777;
+      font-size: 0.85rem;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 450px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Ruleta Container */
+    .wheel-container {
       position: relative;
-      width: 100%;
-      max-width: 380px;
-      aspect-ratio: 1;
-      margin: 0 auto;
+      width: 320px;
+      height: 320px;
+      margin: 10px 0 25px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    #wheelCanvas {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      box-shadow: 0 0 35px rgba(229, 9, 20, 0.35), 0 0 15px rgba(0, 0, 0, 0.9);
-    }
-
-    /* Pointer / Arrow indicator */
-    .wheel-pointer {
+    .pointer {
       position: absolute;
-      top: -18px;
+      top: -12px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-top: 36px solid #E50914;
-      z-index: 20;
-      filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.8));
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 24px solid var(--primary-red);
+      z-index: 10;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
     }
 
-    .wheel-center-cap {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 65px;
-      height: 65px;
-      background: radial-gradient(circle, #222 0%, #000 100%);
-      border: 4px solid #E50914;
+    canvas {
+      width: 320px;
+      height: 320px;
       border-radius: 50%;
-      z-index: 10;
+      box-shadow: 0 0 30px rgba(227, 6, 19, 0.35);
+    }
+
+    /* Center Scissor Icon */
+    .wheel-center-icon {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background-color: #111111;
+      border: 3px solid var(--primary-red);
+      border-radius: 50%;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--primary-red);
+      font-size: 22px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    /* Botón Girar */
+    .btn-spin {
+      background-color: var(--primary-red);
+      color: white;
+      border: none;
+      padding: 14px 40px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 280px;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(227, 6, 19, 0.4);
     }
 
-    /* Confetti animation overlay */
-    .confetti-piece {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #E50914;
-      top: -10px;
-      opacity: 0;
+    .btn-spin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(227, 6, 19, 0.6);
     }
 
-    @keyframes fall {
-      0% {
-        top: -10px;
-        opacity: 1;
-        transform: translateX(0) rotate(0deg);
-      }
-      100% {
-        top: 100%;
-        opacity: 0;
-        transform: translateX(100px) rotate(360deg);
-      }
+    .btn-spin:disabled {
+      background-color: #2A2A2A;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    /* Mensajes de Resultado y Bloqueo */
+    .status-box {
+      margin-top: 20px;
+      padding: 12px 18px;
+      border-radius: 20px;
+      text-align: center;
+      width: 100%;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .status-ticket {
+      background-color: rgba(46, 204, 113, 0.1);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+      color: #2ecc71;
+    }
+
+    .status-error {
+      background-color: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      color: #e74c3c;
+    }
+
+    /* Panel Admin */
+    .admin-panel {
+      background-color: #141414;
+      border: 1px dashed var(--primary-red);
+      border-radius: 15px;
+      padding: 15px;
+      width: 100%;
+      margin-top: 25px;
+    }
+
+    .admin-panel h3 {
+      font-size: 0.9rem;
+      color: var(--primary-red);
+      margin-bottom: 8px;
+    }
+
+    .admin-input {
+      width: 100%;
+      padding: 10px;
+      background: #222;
+      border: 1px solid #333;
+      color: white;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+    }
+
+    .btn-admin {
+      background: #252525;
+      color: white;
+      border: 1px solid #444;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      width: 100%;
+      font-weight: bold;
+    }
+
+    .btn-admin:hover {
+      background: #333;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between p-4 bg-gradient-to-b from-brandBlack via-brandDark to-brandBlack">
+<body>
 
-  <header class="w-full max-w-md text-center pt-4 pb-2">
-    <!-- Logo 0800 Creaciones Reconstructed Visual -->
-    <div class="inline-block bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-md shadow-2xl mb-2">
-      <div class="flex flex-col items-center justify-center">
-        <span class="brand-title-0800 text-4xl sm:text-5xl leading-none tracking-wider">0800</span>
-        <span class="brand-title-creaciones text-2xl sm:text-3xl leading-tight -mt-1">Creaciones</span>
-      </div>
-      <div class="text-[10px] uppercase tracking-widest text-gray-400 mt-1 font-semibold">Corte en Vinilo & Personalizados</div>
-    </div>
-  </header>
+  <!-- AQUÍ CARGA TU LOGO DESDE EL REPOSITORIO -->
+  <img src="logo.jpg" alt="0800 Creaciones" class="brand-logo-img">
 
-  <main class="w-full max-w-md flex flex-col items-center my-auto">
-    
-    <!-- Lockout Notice (Shown when spin used) -->
-    <div id="usedNotice" class="hidden w-full bg-red-950/80 border-2 border-brandRed rounded-2xl p-6 text-center shadow-2xl mb-4 backdrop-blur-md">
-      <div class="w-16 h-16 bg-brandRed/20 text-brandRed rounded-full flex items-center justify-center mx-auto mb-3">
-        <i class="fa-solid fa-lock text-3xl"></i>
-      </div>
-      <h2 class="text-xl font-bold text-white mb-2">Enlace Ya Utilizado</h2>
-      <p class="text-gray-300 text-sm leading-relaxed mb-4">
-        Este enlace de la ruleta ya ha sido canjeado o utilizado previamente.
-      </p>
-      <div class="bg-black/50 p-3 rounded-lg border border-white/10 text-xs text-gray-400">
-        <i class="fa-solid fa-circle-info text-brandRed mr-1"></i> ¡Muchas gracias por tu preferencia en <strong class="text-white">0800 Creaciones</strong>!
-      </div>
+  <!-- TITLE -->
+  <div class="header-text">
+    <h1>¡Girá y Ganá tu Premio!</h1>
+    <p>Giro válido por una sola oportunidad</p>
+  </div>
+
+  <div class="main-container">
+    <div class="wheel-container">
+      <div class="pointer"></div>
+      <canvas id="wheelCanvas" width="320" height="320"></canvas>
+      <div class="wheel-center-icon">✂</div>
     </div>
 
-    <!-- Active Wheel Container -->
-    <div id="wheelWrapper" class="w-full flex flex-col items-center">
-      
-      <!-- Subtitle -->
-      <div class="text-center mb-5">
-        <h1 class="text-2xl font-extrabold text-white tracking-wide">¡Girá y Ganá tu Premio!</h1>
-        <p class="text-xs text-gray-400 mt-1">Giro exclusivo válido por una sola oportunidad</p>
-      </div>
-
-      <!-- Wheel Graphic -->
-      <div class="canvas-container mb-6">
-        <div class="wheel-pointer"></div>
-        <canvas id="wheelCanvas" width="800" height="800"></canvas>
-        <div class="wheel-center-cap">
-          <i class="fa-solid fa-scissors text-brandRed text-xl"></i>
-        </div>
-      </div>
-
-      <!-- Spin Button -->
-      <button id="spinBtn" onclick="spinWheel()" class="w-full max-w-xs bg-gradient-to-r from-brandRed to-red-600 hover:from-red-600 hover:to-brandRed text-white font-extrabold text-lg py-4 px-8 rounded-2xl shadow-lg shadow-brandRed/40 transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-3 border border-red-400/30">
-        <i class="fa-solid fa-sync-alt fa-spin-pulse"></i>
-        <span>GIRAR RULETA</span>
-      </button>
-
-      <!-- Token Status Tag -->
-      <div class="mt-4 flex items-center gap-2 text-xs text-gray-400 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span id="tokenLabel">Ticket de Tiro Único Activo</span>
-      </div>
-
-    </div>
-
-  </main>
-
-  <!-- Admin / Link Generator Panel Toggle -->
-  <footer class="w-full max-w-md mt-6 border-t border-white/10 pt-4 pb-2">
-    <button onclick="toggleAdminPanel()" class="w-full flex items-center justify-between text-xs text-gray-400 hover:text-white transition py-2 px-3 bg-white/5 rounded-xl border border-white/5">
-      <span class="flex items-center gap-2">
-        <i class="fa-solid fa-sliders text-brandRed"></i>
-        <span class="font-medium">Panel de Negocio (Generar Links)</span>
-      </span>
-      <i id="adminChevron" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+    <button id="spinBtn" class="btn-spin" onclick="spinWheel()">
+      <span>🔄</span> GIRAR RULETA
     </button>
 
-    <!-- Admin Generator Card -->
-    <div id="adminPanel" class="hidden mt-3 p-4 bg-brandGray rounded-2xl border border-white/10 shadow-xl">
-      <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
-        <i class="fa-brands fa-whatsapp text-emerald-500 text-base"></i>
-        Generador de Link para Cliente
-      </h3>
-      <p class="text-xs text-gray-400 mb-3">
-        Crea un enlace con un código único que se auto-bloquea después de que el cliente tire la ruleta.
-      </p>
-      
-      <div class="flex flex-col gap-2">
-        <button onclick="generateCustomerLink()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
-          <i class="fa-solid fa-plus-circle"></i>
-          Generar Nuevo Enlace de 1 Uso
-        </button>
+    <div id="statusBox" class="status-box"></div>
 
-        <div id="generatedLinkBox" class="hidden flex flex-col gap-2 mt-2">
-          <input type="text" id="generatedUrlInput" readonly class="w-full bg-black/60 border border-white/20 rounded-xl text-xs text-gray-200 p-2.5 focus:outline-none font-mono">
-          <div class="flex gap-2">
-            <button onclick="copyGeneratedLink()" class="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs py-2 px-3 rounded-lg border border-white/10 transition flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-copy"></i>
-              <span>Copiar Link</span>
-            </button>
-            <button onclick="shareWhatsApp()" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-xs py-2 px-3 rounded-lg transition flex items-center justify-center gap-1.5">
-              <i class="fa-brands fa-whatsapp"></i>
-              <span>Enviar WhatsApp</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- WINNER MODAL -->
-  <div id="prizeModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-brandDark border-2 border-brandRed w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl relative transform transition-all scale-95 opacity-0 duration-300" id="modalCard">
-      
-      <div class="w-20 h-20 bg-brandRed/20 text-brandRed rounded-full flex items-center justify-center mx-auto mb-4 border border-brandRed/40 shadow-lg">
-        <i class="fa-solid fa-trophy text-4xl"></i>
-      </div>
-
-      <h3 class="text-xs font-bold uppercase tracking-widest text-brandRed mb-1">¡Resultado del Giro!</h3>
-      <h2 id="modalPrizeTitle" class="text-2xl font-black text-white mb-3">5% de descuento</h2>
-      
-      <p id="modalPrizeDesc" class="text-xs text-gray-300 mb-6 leading-relaxed">
-        Tomale una captura de pantalla a esta ventana o mostrala en el local de <strong>0800 Creaciones</strong> para hacer válido tu premio.
-      </p>
-
-      <div class="bg-black/60 border border-white/10 rounded-2xl p-3 mb-5 text-left text-xs space-y-1.5 text-gray-400">
-        <div class="flex justify-between">
-          <span>Negocio:</span>
-          <strong class="text-white">0800 Creaciones</strong>
-        </div>
-        <div class="flex justify-between">
-          <span>Código de Ticket:</span>
-          <strong id="modalTicketCode" class="text-brandRed font-mono">#0800-XYZ</strong>
-        </div>
-        <div class="flex justify-between">
-          <span>Estado:</span>
-          <span class="text-emerald-400 font-semibold">Canjeable en tu compra</span>
-        </div>
-      </div>
-
-      <button onclick="closeModal()" class="w-full bg-brandRed hover:bg-brandRedHover text-white font-bold py-3 rounded-xl transition text-sm">
-        Entendido / Cerrar
-      </button>
+    <!-- PANEL SOLO PARA EL DUEÑO (OCULTO A CLIENTES) -->
+    <div id="adminPanel" class="admin-panel" style="display: none;">
+      <h3>🔒 Panel de Control (Uso Interno)</h3>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Generá el enlace único para enviarle al cliente por WhatsApp:</p>
+      <input type="text" id="generatedUrl" class="admin-input" readonly placeholder="Hacé clic abajo para generar el enlace">
+      <button class="btn-admin" onclick="generateClientToken()">✨ Generar y Copiar Link Único</button>
     </div>
   </div>
 
   <script>
-    // 5 Exact prizes requested by 0800 Creaciones
-    const SECTORS = [
-      { label: "5% de descuento", color: "#E50914", textColor: "#FFFFFF" },
-      { label: "10% de descuento", color: "#111111", textColor: "#FFFFFF" },
-      { label: "2x1 Vinilo Globo Burbuja", color: "#222222", textColor: "#FFFFFF" },
-      { label: "¡Otro tiro!", color: "#E50914", textColor: "#FFFFFF" },
-      { label: "Gracias por tu compra", color: "#1A1A1A", textColor: "#999999" }
+    // Configuración de Premios Exactos
+    const prizes = [
+      { label: "5% de descuento", color: "#E30613", textColor: "#ffffff" },
+      { label: "Gracias por tu compra,\nsuerte la próxima", color: "#1c1c1c", textColor: "#aaaaaa" },
+      { label: "10% de descuento", color: "#111111", textColor: "#ffffff" },
+      { label: "2x1 Vinilo\nGlobo Burbuja", color: "#1c1c1c", textColor: "#ffffff" },
+      { label: "¡Otro tiro!", color: "#E30613", textColor: "#ffffff" }
     ];
 
-    const canvas = document.getElementById('wheelCanvas');
-    const ctx = canvas.getContext('2d');
-    const numSectors = SECTORS.length;
-    const sectorAngle = (2 * Math.PI) / numSectors;
+    const canvas = document.getElementById("wheelCanvas");
+    const ctx = canvas.getContext("2d");
+    const spinBtn = document.getElementById("spinBtn");
+    const statusBox = document.getElementById("statusBox");
+    const adminPanel = document.getElementById("adminPanel");
 
     let currentAngle = 0;
     let isSpinning = false;
-    let currentToken = null;
 
+    // Detectar cliente o dueño por URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientToken = urlParams.get("token");
+    const isAdmin = !clientToken;
+
+    if (isAdmin) {
+      adminPanel.style.display = "block";
+    } else {
+      showStatus(`● Ticket Activo: #${clientToken}`, "ticket");
+    }
+
+    if (clientToken) {
+      const usedTokens = JSON.parse(localStorage.getItem("usedTokens") || "[]");
+      if (usedTokens.includes(clientToken)) {
+        showStatus("⚠️ Este enlace ya fue utilizado y tu premio quedó registrado. ¡Gracias por tu compra!", "error");
+        spinBtn.disabled = true;
+      }
+    }
+
+    // --- SONIDOS NATIVOS ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTickSound() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.04);
+    }
+
+    function playWinSound() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const notes = [261.63, 329.63, 392.00, 523.25];
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.1 + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + idx * 0.1);
+        osc.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+      });
+    }
+
+    // Dibujar Ruleta Centrada
     function drawWheel() {
-      const width = canvas.width;
-      const height = canvas.height;
-      const radius = width / 2;
+      const numSegments = prizes.length;
+      const arcSize = (2 * Math.PI) / numSegments;
+      ctx.clearRect(0, 0, 320, 320);
 
-      ctx.clearRect(0, 0, width, height);
-
-      for (let i = 0; i < numSectors; i++) {
-        const startAngle = currentAngle + i * sectorAngle;
-        const endAngle = startAngle + sectorAngle;
-        const sector = SECTORS[i];
-
-        // Draw Sector Wedge
+      for (let i = 0; i < numSegments; i++) {
+        const angle = currentAngle + i * arcSize;
         ctx.beginPath();
-        ctx.moveTo(radius, radius);
-        ctx.arc(radius, radius, radius - 10, startAngle, endAngle);
-        ctx.closePath();
-        ctx.fillStyle = sector.color;
+        ctx.fillStyle = prizes[i].color;
+        ctx.moveTo(160, 160);
+        ctx.arc(160, 160, 155, angle, angle + arcSize);
+        ctx.lineTo(160, 160);
         ctx.fill();
-
-        // Sector Outer Border Line
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 6;
-        ctx.stroke();
-
-        // Inner Sector Divider
-        ctx.strokeStyle = '#222222';
+        ctx.strokeStyle = "#2b2b2b";
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Draw Text inside sector
         ctx.save();
-        ctx.translate(radius, radius);
-        ctx.rotate(startAngle + sectorAngle / 2);
+        ctx.translate(160, 160);
+        ctx.rotate(angle + arcSize / 2);
         ctx.textAlign = "right";
-        ctx.fillStyle = sector.textColor;
-        ctx.font = "bold 32px 'Poppins', sans-serif";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = prizes[i].textColor;
+        ctx.font = "bold 11px sans-serif";
 
-        // Text Wrapping / Formatting for clean display
-        const text = sector.label;
-        if (text.length > 15) {
-          const parts = text.split(" ");
-          ctx.fillText(parts.slice(0, 2).join(" "), radius - 40, -10);
-          ctx.fillText(parts.slice(2).join(" "), radius - 40, 30);
-        } else {
-          ctx.fillText(text, radius - 40, 10);
-        }
+        const lines = prizes[i].label.split("\n");
+        const lineHeight = 13;
+        const startY = -((lines.length - 1) * lineHeight) / 2;
 
+        lines.forEach((line, lineIdx) => {
+          ctx.fillText(line, 130, startY + (lineIdx * lineHeight));
+        });
         ctx.restore();
       }
 
-      // Outer Red Border Rim
       ctx.beginPath();
-      ctx.arc(radius, radius, radius - 5, 0, 2 * Math.PI);
-      ctx.strokeStyle = '#E50914';
-      ctx.lineWidth = 10;
+      ctx.arc(160, 160, 157, 0, Math.PI * 2);
+      ctx.strokeStyle = "#E30613";
+      ctx.lineWidth = 3;
       ctx.stroke();
     }
 
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
-
-    function initPage() {
-      // Get token from URL or assign default demo token
-      currentToken = getQueryParam('token') || 'demo-token-0800';
-      
-      // Check if token has been marked as used in localStorage
-      const usedTokens = JSON.parse(localStorage.getItem('0800_used_tokens') || '{}');
-
-      if (usedTokens[currentToken]) {
-        // Lockout user
-        document.getElementById('wheelWrapper').classList.add('hidden');
-        document.getElementById('usedNotice').classList.remove('hidden');
-      } else {
-        document.getElementById('wheelWrapper').classList.remove('hidden');
-        document.getElementById('usedNotice').classList.add('hidden');
-        document.getElementById('tokenLabel').innerText = `Ticket Activo: #${currentToken.substring(0, 10)}`;
-      }
-
-      drawWheel();
-    }
-
+    // Animación de giro
     function spinWheel() {
       if (isSpinning) return;
 
-      const spinBtn = document.getElementById('spinBtn');
-      spinBtn.disabled = true;
-      spinBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      if (clientToken) {
+        const usedTokens = JSON.parse(localStorage.getItem("usedTokens") || "[]");
+        if (usedTokens.includes(clientToken)) {
+          showStatus("⚠️ Este enlace ya fue utilizado.", "error");
+          spinBtn.disabled = true;
+          return;
+        }
+      }
+
       isSpinning = true;
+      spinBtn.disabled = true;
 
-      // Random target sector calculation
-      const winningIndex = Math.floor(Math.random() * numSectors);
-      
-      // Number of full rotations (5 to 8 turns)
-      const extraTurns = (Math.floor(Math.random() * 3) + 5) * 2 * Math.PI;
-      
-      // Target angle so pointer aligns at the top (Pointer is at -Math.PI / 2)
-      const targetSectorAngle = (numSectors - winningIndex - 0.5) * sectorAngle;
-      const targetAngle = currentAngle + extraTurns + targetSectorAngle - (currentAngle % (2 * Math.PI));
+      const selectedIndex = Math.floor(Math.random() * prizes.length);
+      const segmentArc = (2 * Math.PI) / prizes.length;
+      const targetAngle = (3 * Math.PI / 2) - (selectedIndex * segmentArc) - (segmentArc / 2);
+      const totalRotation = (Math.PI * 2 * 6) + targetAngle;
 
-      const duration = 4500; // 4.5 seconds spin
-      const startTime = performance.now();
-      const startAngle = currentAngle;
+      let start = null;
+      const duration = 4500;
+      let lastSegmentIndex = -1;
 
-      function animate(currentTime) {
-        const elapsed = currentTime - startTime;
+      function animate(timestamp) {
+        if (!start) start = timestamp;
+        const elapsed = timestamp - start;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Ease Out Cubic physics formula
         const easeOut = 1 - Math.pow(1 - progress, 3);
-        
-        currentAngle = startAngle + (targetAngle - startAngle) * easeOut;
+
+        currentAngle = easeOut * totalRotation;
         drawWheel();
+
+        const currentSegment = Math.floor((currentAngle % (Math.PI * 2)) / segmentArc);
+        if (currentSegment !== lastSegmentIndex) {
+          playTickSound();
+          lastSegmentIndex = currentSegment;
+        }
 
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
           isSpinning = false;
-          handleWin(winningIndex);
+          const prize = prizes[selectedIndex].label.replace("\n", " ");
+          playWinSound();
+
+          if (prize.includes("Otro tiro")) {
+            showStatus("🎯 ¡OTRO TIRO! La ruleta vuelve a girar automáticamente...", "ticket");
+            setTimeout(() => {
+              spinWheel();
+            }, 1800);
+          } else {
+            if (prize.includes("Gracias")) {
+              showStatus(`💬 ${prize}`, "ticket");
+            } else {
+              showStatus(`🎉 ¡FELICITACIONES! Ganaste: ${prize}`, "ticket");
+            }
+
+            if (clientToken) {
+              const usedTokens = JSON.parse(localStorage.getItem("usedTokens") || "[]");
+              usedTokens.push(clientToken);
+              localStorage.setItem("usedTokens", JSON.stringify(usedTokens));
+            }
+          }
         }
       }
 
       requestAnimationFrame(animate);
     }
 
-    function handleWin(index) {
-      const prize = SECTORS[index];
-
-      // Mark token as USED in localStorage to prevent repeat spins
-      const usedTokens = JSON.parse(localStorage.getItem('0800_used_tokens') || '{}');
-      usedTokens[currentToken] = {
-        prize: prize.label,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem('0800_used_tokens', JSON.stringify(usedTokens));
-
-      // Display Modal with result
-      document.getElementById('modalPrizeTitle').innerText = prize.label;
-      document.getElementById('modalTicketCode').innerText = `#${currentToken.substring(0, 8).toUpperCase()}`;
-
-      if (prize.label.includes("Gracias")) {
-        document.getElementById('modalPrizeDesc').innerText = "¡Muchas gracias por participar! Esperamos volver a verte pronto en 0800 Creaciones.";
-      } else if (prize.label.includes("Otro tiro")) {
-        document.getElementById('modalPrizeDesc').innerText = "¡Qué suerte! Tenés la posibilidad de pedir un nuevo intento o link para volver a tirar.";
-      } else {
-        document.getElementById('modalPrizeDesc').innerText = "Guardá una captura de pantalla de este resultado y mostrala al realizar tu pedido en 0800 Creaciones.";
-      }
-
-      const modal = document.getElementById('prizeModal');
-      const modalCard = document.getElementById('modalCard');
-      modal.classList.remove('hidden');
-      setTimeout(() => {
-        modalCard.classList.remove('scale-95', 'opacity-0');
-        modalCard.classList.add('scale-100', 'opacity-100');
-      }, 50);
+    function showStatus(msg, type) {
+      statusBox.style.display = "block";
+      statusBox.className = `status-box status-${type}`;
+      statusBox.innerText = msg;
     }
 
-    function closeModal() {
-      const modal = document.getElementById('prizeModal');
-      modal.classList.add('hidden');
-      
-      // Reload to activate single-use lock layout
-      initPage();
-    }
-
-    function toggleAdminPanel() {
-      const panel = document.getElementById('adminPanel');
-      const chevron = document.getElementById('adminChevron');
-      panel.classList.toggle('hidden');
-      chevron.classList.toggle('rotate-180');
-    }
-
-    function generateCustomerLink() {
-      const randomToken = 'cr-' + Math.random().toString(36).substring(2, 10);
+    function generateClientToken() {
+      const newToken = '0800-' + Math.random().toString(36).substr(2, 8).toUpperCase();
       const baseUrl = window.location.origin + window.location.pathname;
-      const fullUrl = `${baseUrl}?token=${randomToken}`;
-
-      document.getElementById('generatedUrlInput').value = fullUrl;
-      document.getElementById('generatedLinkBox').classList.remove('hidden');
-    }
-
-    function copyGeneratedLink() {
-      const input = document.getElementById('generatedUrlInput');
-      input.select();
-      document.execCommand('copy');
+      const fullUrl = `${baseUrl}?token=${newToken}`;
       
-      // Temporarily change button feedback
-      event.currentTarget.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i><span>¡Copiado!</span>';
-      setTimeout(() => {
-        event.currentTarget.innerHTML = '<i class="fa-solid fa-copy"></i><span>Copiar Link</span>';
-      }, 2000);
+      const input = document.getElementById("generatedUrl");
+      input.value = fullUrl;
+      
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        alert("¡Enlace único copiado exitosamente! Ya podés pegarlo en WhatsApp para enviárselo a tu cliente.");
+      }).catch(() => {
+        alert("Enlace generado. Copialo directamente del casillero.");
+      });
     }
 
-    function shareWhatsApp() {
-      const url = document.getElementById('generatedUrlInput').value;
-      const text = `¡Hola! Gracias por tu compra en *0800 Creaciones* ✂️. Te dejamos este link exclusivo para que pases a girar la ruleta de premios (Válido por 1 solo tiro): ${url}`;
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-    }
-
-    // Initialize on page load
-    window.onload = initPage;
+    drawWheel();
   </script>
 </body>
 </html>
