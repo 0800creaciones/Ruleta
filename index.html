@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruleta de Premios | 0800 Creaciones</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandRed: '#E50914',
+            brandRedHover: '#C10710',
+            brandDark: '#111111',
+            brandBlack: '#050505',
+            brandGray: '#1F1F1F',
+            brandLightGray: '#2D2D2D'
+          },
+          fontFamily: {
+            brand: ['Orbitron', 'sans-serif'],
+            sans: ['Poppins', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom CSS for brand styling & animations */
+    body {
+      background-color: #080808;
+      color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .brand-title-0800 {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      letter-spacing: 1px;
+      -webkit-text-stroke: 2px #000;
+      color: #ffffff;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .brand-title-creaciones {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      color: #E50914;
+      font-style: italic;
+      letter-spacing: -0.5px;
+      text-shadow: 2px 2px 0px #000000, -1px -1px 0px #000000;
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 1;
+      margin: 0 auto;
+    }
+
+    #wheelCanvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 0 35px rgba(229, 9, 20, 0.35), 0 0 15px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Pointer / Arrow indicator */
+    .wheel-pointer {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 36px solid #E50914;
+      z-index: 20;
+      filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.8));
+    }
+
+    .wheel-center-cap {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 65px;
+      height: 65px;
+      background: radial-gradient(circle, #222 0%, #000 100%);
+      border: 4px solid #E50914;
+      border-radius: 50%;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Confetti animation overlay */
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #E50914;
+      top: -10px;
+      opacity: 0;
+    }
+
+    @keyframes fall {
+      0% {
+        top: -10px;
+        opacity: 1;
+        transform: translateX(0) rotate(0deg);
+      }
+      100% {
+        top: 100%;
+        opacity: 0;
+        transform: translateX(100px) rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-4 bg-gradient-to-b from-brandBlack via-brandDark to-brandBlack">
+
+  <header class="w-full max-w-md text-center pt-4 pb-2">
+    <!-- Logo 0800 Creaciones Reconstructed Visual -->
+    <div class="inline-block bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-md shadow-2xl mb-2">
+      <div class="flex flex-col items-center justify-center">
+        <span class="brand-title-0800 text-4xl sm:text-5xl leading-none tracking-wider">0800</span>
+        <span class="brand-title-creaciones text-2xl sm:text-3xl leading-tight -mt-1">Creaciones</span>
+      </div>
+      <div class="text-[10px] uppercase tracking-widest text-gray-400 mt-1 font-semibold">Corte en Vinilo & Personalizados</div>
+    </div>
+  </header>
+
+  <main class="w-full max-w-md flex flex-col items-center my-auto">
+    
+    <!-- Lockout Notice (Shown when spin used) -->
+    <div id="usedNotice" class="hidden w-full bg-red-950/80 border-2 border-brandRed rounded-2xl p-6 text-center shadow-2xl mb-4 backdrop-blur-md">
+      <div class="w-16 h-16 bg-brandRed/20 text-brandRed rounded-full flex items-center justify-center mx-auto mb-3">
+        <i class="fa-solid fa-lock text-3xl"></i>
+      </div>
+      <h2 class="text-xl font-bold text-white mb-2">Enlace Ya Utilizado</h2>
+      <p class="text-gray-300 text-sm leading-relaxed mb-4">
+        Este enlace de la ruleta ya ha sido canjeado o utilizado previamente.
+      </p>
+      <div class="bg-black/50 p-3 rounded-lg border border-white/10 text-xs text-gray-400">
+        <i class="fa-solid fa-circle-info text-brandRed mr-1"></i> ¡Muchas gracias por tu preferencia en <strong class="text-white">0800 Creaciones</strong>!
+      </div>
+    </div>
+
+    <!-- Active Wheel Container -->
+    <div id="wheelWrapper" class="w-full flex flex-col items-center">
+      
+      <!-- Subtitle -->
+      <div class="text-center mb-5">
+        <h1 class="text-2xl font-extrabold text-white tracking-wide">¡Girá y Ganá tu Premio!</h1>
+        <p class="text-xs text-gray-400 mt-1">Giro exclusivo válido por una sola oportunidad</p>
+      </div>
+
+      <!-- Wheel Graphic -->
+      <div class="canvas-container mb-6">
+        <div class="wheel-pointer"></div>
+        <canvas id="wheelCanvas" width="800" height="800"></canvas>
+        <div class="wheel-center-cap">
+          <i class="fa-solid fa-scissors text-brandRed text-xl"></i>
+        </div>
+      </div>
+
+      <!-- Spin Button -->
+      <button id="spinBtn" onclick="spinWheel()" class="w-full max-w-xs bg-gradient-to-r from-brandRed to-red-600 hover:from-red-600 hover:to-brandRed text-white font-extrabold text-lg py-4 px-8 rounded-2xl shadow-lg shadow-brandRed/40 transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-3 border border-red-400/30">
+        <i class="fa-solid fa-sync-alt fa-spin-pulse"></i>
+        <span>GIRAR RULETA</span>
+      </button>
+
+      <!-- Token Status Tag -->
+      <div class="mt-4 flex items-center gap-2 text-xs text-gray-400 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="tokenLabel">Ticket de Tiro Único Activo</span>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Admin / Link Generator Panel Toggle -->
+  <footer class="w-full max-w-md mt-6 border-t border-white/10 pt-4 pb-2">
+    <button onclick="toggleAdminPanel()" class="w-full flex items-center justify-between text-xs text-gray-400 hover:text-white transition py-2 px-3 bg-white/5 rounded-xl border border-white/5">
+      <span class="flex items-center gap-2">
+        <i class="fa-solid fa-sliders text-brandRed"></i>
+        <span class="font-medium">Panel de Negocio (Generar Links)</span>
+      </span>
+      <i id="adminChevron" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+    </button>
+
+    <!-- Admin Generator Card -->
+    <div id="adminPanel" class="hidden mt-3 p-4 bg-brandGray rounded-2xl border border-white/10 shadow-xl">
+      <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+        <i class="fa-brands fa-whatsapp text-emerald-500 text-base"></i>
+        Generador de Link para Cliente
+      </h3>
+      <p class="text-xs text-gray-400 mb-3">
+        Crea un enlace con un código único que se auto-bloquea después de que el cliente tire la ruleta.
+      </p>
+      
+      <div class="flex flex-col gap-2">
+        <button onclick="generateCustomerLink()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+          <i class="fa-solid fa-plus-circle"></i>
+          Generar Nuevo Enlace de 1 Uso
+        </button>
+
+        <div id="generatedLinkBox" class="hidden flex flex-col gap-2 mt-2">
+          <input type="text" id="generatedUrlInput" readonly class="w-full bg-black/60 border border-white/20 rounded-xl text-xs text-gray-200 p-2.5 focus:outline-none font-mono">
+          <div class="flex gap-2">
+            <button onclick="copyGeneratedLink()" class="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs py-2 px-3 rounded-lg border border-white/10 transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-copy"></i>
+              <span>Copiar Link</span>
+            </button>
+            <button onclick="shareWhatsApp()" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-xs py-2 px-3 rounded-lg transition flex items-center justify-center gap-1.5">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>Enviar WhatsApp</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WINNER MODAL -->
+  <div id="prizeModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-brandDark border-2 border-brandRed w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl relative transform transition-all scale-95 opacity-0 duration-300" id="modalCard">
+      
+      <div class="w-20 h-20 bg-brandRed/20 text-brandRed rounded-full flex items-center justify-center mx-auto mb-4 border border-brandRed/40 shadow-lg">
+        <i class="fa-solid fa-trophy text-4xl"></i>
+      </div>
+
+      <h3 class="text-xs font-bold uppercase tracking-widest text-brandRed mb-1">¡Resultado del Giro!</h3>
+      <h2 id="modalPrizeTitle" class="text-2xl font-black text-white mb-3">5% de descuento</h2>
+      
+      <p id="modalPrizeDesc" class="text-xs text-gray-300 mb-6 leading-relaxed">
+        Tomale una captura de pantalla a esta ventana o mostrala en el local de <strong>0800 Creaciones</strong> para hacer válido tu premio.
+      </p>
+
+      <div class="bg-black/60 border border-white/10 rounded-2xl p-3 mb-5 text-left text-xs space-y-1.5 text-gray-400">
+        <div class="flex justify-between">
+          <span>Negocio:</span>
+          <strong class="text-white">0800 Creaciones</strong>
+        </div>
+        <div class="flex justify-between">
+          <span>Código de Ticket:</span>
+          <strong id="modalTicketCode" class="text-brandRed font-mono">#0800-XYZ</strong>
+        </div>
+        <div class="flex justify-between">
+          <span>Estado:</span>
+          <span class="text-emerald-400 font-semibold">Canjeable en tu compra</span>
+        </div>
+      </div>
+
+      <button onclick="closeModal()" class="w-full bg-brandRed hover:bg-brandRedHover text-white font-bold py-3 rounded-xl transition text-sm">
+        Entendido / Cerrar
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 5 Exact prizes requested by 0800 Creaciones
+    const SECTORS = [
+      { label: "5% de descuento", color: "#E50914", textColor: "#FFFFFF" },
+      { label: "10% de descuento", color: "#111111", textColor: "#FFFFFF" },
+      { label: "2x1 Vinilo Globo Burbuja", color: "#222222", textColor: "#FFFFFF" },
+      { label: "¡Otro tiro!", color: "#E50914", textColor: "#FFFFFF" },
+      { label: "Gracias por tu compra", color: "#1A1A1A", textColor: "#999999" }
+    ];
+
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const numSectors = SECTORS.length;
+    const sectorAngle = (2 * Math.PI) / numSectors;
+
+    let currentAngle = 0;
+    let isSpinning = false;
+    let currentToken = null;
+
+    function drawWheel() {
+      const width = canvas.width;
+      const height = canvas.height;
+      const radius = width / 2;
+
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = 0; i < numSectors; i++) {
+        const startAngle = currentAngle + i * sectorAngle;
+        const endAngle = startAngle + sectorAngle;
+        const sector = SECTORS[i];
+
+        // Draw Sector Wedge
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius - 10, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = sector.color;
+        ctx.fill();
+
+        // Sector Outer Border Line
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 6;
+        ctx.stroke();
+
+        // Inner Sector Divider
+        ctx.strokeStyle = '#222222';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw Text inside sector
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(startAngle + sectorAngle / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = sector.textColor;
+        ctx.font = "bold 32px 'Poppins', sans-serif";
+
+        // Text Wrapping / Formatting for clean display
+        const text = sector.label;
+        if (text.length > 15) {
+          const parts = text.split(" ");
+          ctx.fillText(parts.slice(0, 2).join(" "), radius - 40, -10);
+          ctx.fillText(parts.slice(2).join(" "), radius - 40, 30);
+        } else {
+          ctx.fillText(text, radius - 40, 10);
+        }
+
+        ctx.restore();
+      }
+
+      // Outer Red Border Rim
+      ctx.beginPath();
+      ctx.arc(radius, radius, radius - 5, 0, 2 * Math.PI);
+      ctx.strokeStyle = '#E50914';
+      ctx.lineWidth = 10;
+      ctx.stroke();
+    }
+
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    function initPage() {
+      // Get token from URL or assign default demo token
+      currentToken = getQueryParam('token') || 'demo-token-0800';
+      
+      // Check if token has been marked as used in localStorage
+      const usedTokens = JSON.parse(localStorage.getItem('0800_used_tokens') || '{}');
+
+      if (usedTokens[currentToken]) {
+        // Lockout user
+        document.getElementById('wheelWrapper').classList.add('hidden');
+        document.getElementById('usedNotice').classList.remove('hidden');
+      } else {
+        document.getElementById('wheelWrapper').classList.remove('hidden');
+        document.getElementById('usedNotice').classList.add('hidden');
+        document.getElementById('tokenLabel').innerText = `Ticket Activo: #${currentToken.substring(0, 10)}`;
+      }
+
+      drawWheel();
+    }
+
+    function spinWheel() {
+      if (isSpinning) return;
+
+      const spinBtn = document.getElementById('spinBtn');
+      spinBtn.disabled = true;
+      spinBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      isSpinning = true;
+
+      // Random target sector calculation
+      const winningIndex = Math.floor(Math.random() * numSectors);
+      
+      // Number of full rotations (5 to 8 turns)
+      const extraTurns = (Math.floor(Math.random() * 3) + 5) * 2 * Math.PI;
+      
+      // Target angle so pointer aligns at the top (Pointer is at -Math.PI / 2)
+      const targetSectorAngle = (numSectors - winningIndex - 0.5) * sectorAngle;
+      const targetAngle = currentAngle + extraTurns + targetSectorAngle - (currentAngle % (2 * Math.PI));
+
+      const duration = 4500; // 4.5 seconds spin
+      const startTime = performance.now();
+      const startAngle = currentAngle;
+
+      function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Ease Out Cubic physics formula
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        
+        currentAngle = startAngle + (targetAngle - startAngle) * easeOut;
+        drawWheel();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          isSpinning = false;
+          handleWin(winningIndex);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function handleWin(index) {
+      const prize = SECTORS[index];
+
+      // Mark token as USED in localStorage to prevent repeat spins
+      const usedTokens = JSON.parse(localStorage.getItem('0800_used_tokens') || '{}');
+      usedTokens[currentToken] = {
+        prize: prize.label,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('0800_used_tokens', JSON.stringify(usedTokens));
+
+      // Display Modal with result
+      document.getElementById('modalPrizeTitle').innerText = prize.label;
+      document.getElementById('modalTicketCode').innerText = `#${currentToken.substring(0, 8).toUpperCase()}`;
+
+      if (prize.label.includes("Gracias")) {
+        document.getElementById('modalPrizeDesc').innerText = "¡Muchas gracias por participar! Esperamos volver a verte pronto en 0800 Creaciones.";
+      } else if (prize.label.includes("Otro tiro")) {
+        document.getElementById('modalPrizeDesc').innerText = "¡Qué suerte! Tenés la posibilidad de pedir un nuevo intento o link para volver a tirar.";
+      } else {
+        document.getElementById('modalPrizeDesc').innerText = "Guardá una captura de pantalla de este resultado y mostrala al realizar tu pedido en 0800 Creaciones.";
+      }
+
+      const modal = document.getElementById('prizeModal');
+      const modalCard = document.getElementById('modalCard');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modalCard.classList.remove('scale-95', 'opacity-0');
+        modalCard.classList.add('scale-100', 'opacity-100');
+      }, 50);
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('prizeModal');
+      modal.classList.add('hidden');
+      
+      // Reload to activate single-use lock layout
+      initPage();
+    }
+
+    function toggleAdminPanel() {
+      const panel = document.getElementById('adminPanel');
+      const chevron = document.getElementById('adminChevron');
+      panel.classList.toggle('hidden');
+      chevron.classList.toggle('rotate-180');
+    }
+
+    function generateCustomerLink() {
+      const randomToken = 'cr-' + Math.random().toString(36).substring(2, 10);
+      const baseUrl = window.location.origin + window.location.pathname;
+      const fullUrl = `${baseUrl}?token=${randomToken}`;
+
+      document.getElementById('generatedUrlInput').value = fullUrl;
+      document.getElementById('generatedLinkBox').classList.remove('hidden');
+    }
+
+    function copyGeneratedLink() {
+      const input = document.getElementById('generatedUrlInput');
+      input.select();
+      document.execCommand('copy');
+      
+      // Temporarily change button feedback
+      event.currentTarget.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i><span>¡Copiado!</span>';
+      setTimeout(() => {
+        event.currentTarget.innerHTML = '<i class="fa-solid fa-copy"></i><span>Copiar Link</span>';
+      }, 2000);
+    }
+
+    function shareWhatsApp() {
+      const url = document.getElementById('generatedUrlInput').value;
+      const text = `¡Hola! Gracias por tu compra en *0800 Creaciones* ✂️. Te dejamos este link exclusivo para que pases a girar la ruleta de premios (Válido por 1 solo tiro): ${url}`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // Initialize on page load
+    window.onload = initPage;
+  </script>
+</body>
+</html>
