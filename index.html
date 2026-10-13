@@ -10,7 +10,6 @@
       --dark-bg: #0b0b0b;
       --card-bg: #141414;
       --text-white: #ffffff;
-      --border-color: #222222;
     }
 
     * {
@@ -95,6 +94,7 @@
       height: 320px;
       border-radius: 50%;
       box-shadow: 0 0 30px rgba(227, 6, 19, 0.35);
+      background-color: #111;
     }
 
     .wheel-center-icon {
@@ -242,7 +242,7 @@
 
     <div id="statusBox" class="status-box"></div>
 
-    <!-- PANEL DE CONTROL PROTEGIDO (SOLO SE ABRE CON ?admin=0214) -->
+    <!-- PANEL DE CONTROL PROTEGIDO -->
     <div id="adminPanel" class="admin-panel">
       <h3>🔒 Panel de Control (Dueño)</h3>
       <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Generá el enlace único para el cliente:</p>
@@ -269,7 +269,53 @@
     let currentAngle = 0;
     let isSpinning = false;
 
-    // Validación de accesos por URL (clave cambiada a 0214)
+    // Dibujar Ruleta Centrada (Garantizado)
+    function drawWheel() {
+      const numSegments = prizes.length;
+      const arcSize = (2 * Math.PI) / numSegments;
+      ctx.clearRect(0, 0, 320, 320);
+
+      for (let i = 0; i < numSegments; i++) {
+        const angle = currentAngle + i * arcSize;
+        ctx.beginPath();
+        ctx.fillStyle = prizes[i].color;
+        ctx.moveTo(160, 160);
+        ctx.arc(160, 160, 155, angle, angle + arcSize);
+        ctx.lineTo(160, 160);
+        ctx.fill();
+        ctx.strokeStyle = "#2b2b2b";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(160, 160);
+        ctx.rotate(angle + arcSize / 2);
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = prizes[i].textColor;
+        ctx.font = "bold 11px sans-serif";
+
+        const lines = prizes[i].label.split("\n");
+        const lineHeight = 13;
+        const startY = -((lines.length - 1) * lineHeight) / 2;
+
+        lines.forEach((line, lineIdx) => {
+          ctx.fillText(line, 130, startY + (lineIdx * lineHeight));
+        });
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.arc(160, 160, 157, 0, Math.PI * 2);
+      ctx.strokeStyle = "#E30613";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+
+    // Inicializar ruleta visualmente de inmediato
+    drawWheel();
+
+    // Validaciones de acceso
     const urlParams = new URLSearchParams(window.location.search);
     const clientToken = urlParams.get("token");
     const adminKey = urlParams.get("admin");
@@ -327,49 +373,6 @@
       });
     }
 
-    // Dibujar Ruleta Centrada
-    function drawWheel() {
-      const numSegments = prizes.length;
-      const arcSize = (2 * Math.PI) / numSegments;
-      ctx.clearRect(0, 0, 320, 320);
-
-      for (let i = 0; i < numSegments; i++) {
-        const angle = currentAngle + i * arcSize;
-        ctx.beginPath();
-        ctx.fillStyle = prizes[i].color;
-        ctx.moveTo(160, 160);
-        ctx.arc(160, 160, 155, angle, angle + arcSize);
-        ctx.lineTo(160, 160);
-        ctx.fill();
-        ctx.strokeStyle = "#2b2b2b";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.save();
-        ctx.translate(160, 160);
-        ctx.rotate(angle + arcSize / 2);
-        ctx.textAlign = "right";
-        ctx.textBaseline = "middle";
-        ctx.fillStyle = prizes[i].textColor;
-        ctx.font = "bold 11px sans-serif";
-
-        const lines = prizes[i].label.split("\n");
-        const lineHeight = 13;
-        const startY = -((lines.length - 1) * lineHeight) / 2;
-
-        lines.forEach((line, lineIdx) => {
-          ctx.fillText(line, 130, startY + (lineIdx * lineHeight));
-        });
-        ctx.restore();
-      }
-
-      ctx.beginPath();
-      ctx.arc(160, 160, 157, 0, Math.PI * 2);
-      ctx.strokeStyle = "#E30613";
-      ctx.lineWidth = 3;
-      ctx.stroke();
-    }
-
     // Animación de giro
     function spinWheel() {
       if (isSpinning) return;
@@ -420,4 +423,47 @@
           if (prize.includes("Otro tiro")) {
             showStatus("🎯 ¡OTRO TIRO! La ruleta vuelve a girar automáticamente...", "ticket");
             setTimeout(() => {
-              spin
+              spinWheel();
+            }, 1800);
+          } else {
+            if (prize.includes("Gracias")) {
+              showStatus(`💬 ${prize}.<br><br><b>📸 ¡Hacé captura de pantalla ahora!</b> Este enlace es de un solo uso y no habrá otro tiro.`, "ticket");
+            } else {
+              showStatus(`🎉 ¡FELICITACIONES! Ganaste: <b>${prize}</b>.<br><br><b>📸 ¡Hacé captura de pantalla ahora!</b> Presentá esta imagen para reclamar tu premio. No habrá otro tiro.`, "ticket");
+            }
+
+            if (clientToken) {
+              const usedTokens = JSON.parse(localStorage.getItem("usedTokens") || "[]");
+              usedTokens.push(clientToken);
+              localStorage.setItem("usedTokens", JSON.stringify(usedTokens));
+            }
+          }
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function showStatus(msg, type) {
+      statusBox.style.display = "block";
+      statusBox.className = `status-box status-${type}`;
+      statusBox.innerHTML = msg;
+    }
+
+    function generateClientToken() {
+      const newToken = '0800-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+      const baseUrl = window.location.origin + window.location.pathname;
+      const fullUrl = `${baseUrl}?token=${newToken}`;
+      
+      const input = document.getElementById("generatedUrl");
+      input.value = fullUrl;
+      
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        alert("¡Enlace único copiado exitosamente! Ya podés pegarlo en WhatsApp para enviárselo a tu cliente.");
+      }).catch(() => {
+        alert("Enlace generado. Copialo directamente del casillero.");
+      });
+    }
+  </script>
+</body>
+</html>
